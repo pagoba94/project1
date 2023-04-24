@@ -1,5 +1,8 @@
 # project1: HappyCo is organizing a scuba diving day for its employees!
 
+![image](https://user-images.githubusercontent.com/127286755/234131147-b40297c3-03ff-4bec-a5cc-151c3ae7b549.png)
+
+
 ## Project Overview
 Some employees say that they only go if it is an area where there are no white sharks, others say that there are other sharks much more dangerous, that they should not only think about the white shark. In addition, some women say that they are much more at risk of being attacked, since they have heard that sharks attack women more, especially if they are on their period. 
 
