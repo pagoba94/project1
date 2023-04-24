@@ -5,6 +5,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
+def seaborn_set():
+    sns.set_context("poster")
+    sns.set(rc={"figure.figsize": (15.,10.)})
+    sns.set_style("whitegrid")
+
 def species_vs_total_attacks(df):
     """This function Creates a countplot with species column in ascending order and with deep palette, Rotate x-axis 
     tick labels for better readability and modifies title, xlabel and ylabel. Finally it saves the plot as an image 
