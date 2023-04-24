@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import seaborn as sns
+import os
 import matplotlib.pyplot as plt
 import src.downloading as dl
 import src.cleaning as cl
@@ -15,6 +16,8 @@ df = cl.species_cleaning(df)
 df = cl.type_species_cleaning(df)
 df = cl.fatality_sex_cleaning(df)
 df = cl.visualization_cleaning(df)
-df = vis.visualization1(df)
-df = vis.visualization2(df)
-df = vis.visualization3(df)
+vis.species_vs_total_attacks(df)
+vis.species_vs_attacks_pie(df)
+vis.species_vs_attacks_fatality(df)
+vis.fatality_sex(df)
+vis.species_vs_fatality(df)

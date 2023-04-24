@@ -2,51 +2,75 @@ import pandas as pd
 import re
 
 def basic_cleaning(df):
-    #modificamos todas las letras a minúsculas
+    """This function modifies all words to lowercase, modifies the spaces in the column titles (replaces spaces with "_"),
+    removes all rows with all NaN values, and removes duplicates.
+    args: df
+    return: df. cleaned df
+    """
+    
+    #modifies all words to lowercase
     df=df.applymap(lambda x: x.lower() if type(x) == str else x)
-    #modificamos los espacios blancos en los titulos de las las columnas por añadimos _
+    #modifies the spaces in the column titles (replaces spaces with "_"
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     #drops all rows from DataFrame "df" that contain all missing values (NaN)
     df = df.dropna(how='all')
-    #eliminamos duplicados
+    #removes duplicates
     df= df.drop_duplicates()
     
     return df
 
 
 def cleaning_df1(df):
+    """This function #remove the indicated columns from the df, creates a copy of the species_ column called species2,
+    remove all rows from the indicated columns with duplicates, drops all rows from df that contain all missing values (NaN)
+    in the specified subset of columns ('type', 'fatal_(y/n)', 'species2') and modifies the DataFrame in place. And renames some columns.
+    args: df
+    return: df. cleaned df
+    """
     
-    #creates a copy of the principal df named df1
-    #eliminamos las columnas indicadas del df1
+    #remove the indicated columns from the df
     df.drop(['case_number', 'date', 'year', 'area', 'location', 'activity', 'name','investigator_or_source','pdf','href_formula', 'href', 'case_number.1', 'case_number.2', 'unnamed:_22','unnamed:_23' ], axis=1, inplace=True)
-    ##creamos una copia de la columna species
+    #create a copy of the species_ column called species2
     df['species2']=df['species_'].copy()
-    #eliminamos todas las filas de las columnas indicadas con duplicados
+    #remove all rows from the indicated columns with duplicates.
     df.drop_duplicates() 
-    #drops all rows from df1 that contain all missing values (NaN) in the specified subset of columns ('type', 'fatal_(y/n)', 'species2') and modifies the DataFrame in place.
+    #drops all rows from df that contain all missing values (NaN) in the specified subset of columns ('type', 'fatal_(y/n)', 'species2') and modifies the DataFrame in place.
     df.dropna(subset=['type', 'fatal_(y/n)', 'species2'], how='all', inplace=True)
     #rename some columns
-    df.rename(columns={'species_': 'species1', 'fatal_(y/n)':'fatality', 'sex_' : 'sex'}, inplace=True)
+    df.rename(columns={'species_': 'species', 'fatal_(y/n)':'fatality', 'sex_' : 'sex'}, inplace=True)
     
     return df
 
 
 
 def cleaning_df2(df):
-      
-    # Eliminar las filas con valores NaN en la columna species2
+    """This function rops all rows from df that contain all missing values (NaN) in the specified subset of column ('species2')
+    and modifies the DataFrame in place. It searches on the column ('species2')for any numeric character (\d) followed by an optional character (.) and 
+    removes it, as well as deletes anything that's not a letter.
+    args: df
+    return: df. cleaned df
+    """
+    #drops all rows from df that contain all missing values (NaN) in the specified subset of column ('species2') and modifies the DataFrame in place.
     df.dropna(subset=['species2'], how='all', inplace=True)
     
     #It searches for any numeric character (\d) followed by an optional character (.) and removes it
     df['species2']=df['species2'].apply(lambda x: re.sub(r'\d.?', '', x, flags=re.IGNORECASE))
     
-    #deletting anything that's not a letter
+    #deletes anything that's not a letter
     df['species2'] = df['species2'].apply(lambda x: re.sub(r'\W+', ' ', x))
     
-    return df 
+    return df
 
 
 def species_cleaning(df):
+    """This function modifies column species2, removes the letters 'm' and 'a' if they are found out of words,
+    drops rows from df where the value in the 'species2' column is equal to any string in the "not_involved" list, 
+    creates a dictionary with the species types and the values they appear with in the dataset, Iterates over each element
+    of the species2 column of the dataframe and replace the values for the keys, and keeps only the words with more than two
+    characters and then joins them back together with spaces
+    args: df
+    return: df. cleaned df
+    """
     
     #removes the letters 'm' and 'a' if they are found out of words.
     df['species2'] = df['species2'].str.replace(r'\s[m|a]\s', ' ', regex=True)
@@ -58,7 +82,7 @@ def species_cleaning(df):
     for case in not_involved:
         df.drop(df[df['species2'] == case].index)
     
-    #creamos un diccionario con los tipos de especies y los valores con los que aparece en el dataset
+    #create a dictionary with the species types and the values they appear with in the dataset
     species_dict={'white shark': 'white shark|whites', 
                   'nurse shark': 'nurse|nurses',
                   'tiger shark': 'tiger|tigers',
@@ -83,33 +107,37 @@ def species_cleaning(df):
                   'small shark' : 'small shark|small sharks'
                  }
     
-    # Itera sobre cada elemento de la columna species2 del dataframe y reemplaza los valores
+    # Iterate over each element of the species2 column of the dataframe and replace the values for the keys
     for key, value in species_dict.items():
         mask= df['species2'].str.contains(value, case=False)
         df.loc[mask, 'species2'] = key
 
-    #modificamos las celdas donde aparece una especie
+    #modify the cells where a species appears.
     for specie, word in species_dict.items():   
         df.loc[df['species2'].str.contains(word, case=False), 'species2'] = specie
-    
     
     #keeps only the words with more than two characters and then joins them back together with spaces
     df['species2'] = df['species2'].apply(lambda x: ' '.join([word for word in x.split() if len(word) > 2]))
     
-    
-    
     return df
 
 
-def type_species_cleaning(df):
 
-    #drops rows from df where the value in the 'type' column is equal to 'invalid', and modifies the df3.
+def type_species_cleaning(df):
+    """This function drops rows from df where the value in the 'type' column is equal to 'invalid', and modifies the df.
+    eliminate rows with species2 column with Nan, removes the unique values that have less than 6 elements on the species2
+    column in df, remove those unique values that are not shark species. drops age and time columns from the df.
+    args: df
+    return: df. cleaned df
+    """
+    
+    #drops rows from df where the value in the 'type' column is equal to 'invalid', and modifies the df.
     df.drop(df[df['type'] =='invalid'].index, inplace=True)
     
-    #we eliminate rows with species2 column with Nan 
+    #eliminate rows with species2 column with Nan 
     df.dropna(subset=['species2'], how='all', inplace=True)
     
-    #we remove the unique values that have less than 6 elements on the species2 column in df
+    #remove the unique values that have less than 6 elements on the species2 column in df
     species_counts= {}
     for i,x in df['species2'].value_counts().items():
         species_counts[i]=x
@@ -122,7 +150,7 @@ def type_species_cleaning(df):
                 new_dict[key] = value
 
     
-    #we remove those unique values that are not shark species
+    #remove those unique values that are not shark species
     species_list = list(new_dict.keys())
     species_list.remove('shark')
     species_list.remove('')
@@ -133,29 +161,33 @@ def type_species_cleaning(df):
     
     df = df[df['species2'].isin(species_list)]
     
-    
+    #drops age and time columns from the df
     df.drop(['age', 'time'], axis=1, inplace=True)
 
     return df
 
 
 def fatality_sex_cleaning(df):
-    #modificamos los datos de la columna fatality
+    """This function modifies specified data in the fatality column an Replaces words in the selected rows.
+    args: df
+    return: df. cleaned df
+    """
+    #modify the data in the fatality column
     mask_unknown = (df['fatality'] == '2017')
     
-    # Reemplazar las palabras en las filas seleccionadas
+    #Replace the words in the selected rows
     df.loc[mask_unknown, 'fatality'] = 'unknown'
     
-    #modificamos los datos de la columna fatality
+    #modify the data in the fatality column
     mask_no = (df['fatality'] == ' n')
     
-    # Reemplazar las palabras en las filas seleccionadas
+    #Replace the words in the selected rows
     df.loc[mask_no, 'fatality'] = 'n'
     
-    #modificamos los datos de la columna fatality
+    #modify the data in the fatality columny
     mask_unknown2 = (df['fatality'] == 'm')
     
-    # Reemplazar las palabras en las filas seleccionadas
+    #Replace the words in the selected rows
     df.loc[mask_unknown2, 'fatality'] = 'unknown'
     
     df['sex']=df['sex'].str.replace(r'm\s', 'm', regex=True)
@@ -166,18 +198,22 @@ def fatality_sex_cleaning(df):
 
 
 def visualization_cleaning(df):
-    #creamos un df con la variable especies y fatality
-    df = df.loc[:, ['species2', 'fatality']]
+    """This function modifies specified data in the fatality column an Replaces words in the selected rows to yes or no.
+    args: df
+    return: df. cleaned df
+    """
+    
+    #create a df with the variables species, sex, and fatality
+    df = df.loc[:, ['species2', 'fatality','sex']]
     df.rename(columns={'species2': 'species'}, inplace=True)
     
-    #modificamos los datos de la columna fatality por integers
-    no_fatality = (df['fatality'] == 'n')
-    # Reemplazar las palabras en las filas seleccionadas
-    df.loc[no_fatality, 'fatality'] = 0
     
-    #modificamos los datos de la columna fatality por integers
+    #modify the data in the fatality column to yes or no
+    no_fatality = (df['fatality'] == 'n')
+    df.loc[no_fatality, 'fatality'] = "no"
+    
     yes_fatality = (df['fatality'] == 'y')
-    # Reemplazar las palabras en las filas seleccionadas
-    df.loc[yes_fatality, 'fatality'] = 1
+    df.loc[yes_fatality, 'fatality'] = "yes"
+    
     
     return df
