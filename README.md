@@ -22,8 +22,7 @@ We will carry out a study with the data provided by to see which species are the
 - White sharks are the most dangerous specie. 
 - Sharks do not attack more women, they attack more men. 
 - Most of the attacks end up without a fatality. 
-=======
->>>>>>> ec3cab2e100042e6a5d0baf6b27dd3c831eb0f8c
+
 
 ## Project Overview
 Some employees say that they only go if it is an area where there are no white sharks, others say that there are other sharks much more dangerous, that they should not only think about the white shark. In addition, some women say that they are much more at risk of being attacked, since they have heard that sharks attack women more, especially if they are on their period. 
