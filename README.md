@@ -12,12 +12,11 @@ We will carry out a study with the data provided by to see which species are the
 "Global Shark Attacks" is a table of shark attack incidents compiled by the Global Shark Attack File and it was downloaded with permission from the Global Shark Attack File's website.
 
 ## On this repo you will mainly find:
-- **data**: stores the data used for the analysis
-- **figures**: plots png files
-- **src**: stores the src files with all the functions used
-- Analysis.ipynb: jupyter notebook file with all the functions and plots used
-- exploration2.ipynb and exploration.ipynb: jupyter notebook files with exploration data
-- main.py :
+- **figures**: plots created, png files.
+- **src**: stores the src files with all the functions used.
+- _Analysis.ipynb_: jupyter notebook file with all the functions and plots used.
+- _exploration2.ipynb and exploration.ipynb:_ jupyter notebook files with exploration data.
+- _main.py:_ python file that creates and saves plots on figures folder.
 
 ## Conclusions: 
 - White sharks are the most dangerous specie. 
